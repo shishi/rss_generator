@@ -1,2 +1,11 @@
 # config/sites.yml
-sites: []
+sites:
+  - name: "聖巡エクスタシー"
+    id: "yanmaga-seijun"
+    url: "https://yanmaga.jp/comics/%E8%81%96%E5%B7%A1%E3%82%A8%E3%82%AF%E3%82%B9%E3%82%BF%E3%82%B7%E3%83%BC_%E3%81%97%E3%81%AA%E3%81%84%E3%81%A8%E5%87%BA%E3%82%89%E3%82%8C%E3%81%AA%E3%81%84%E9%83%A8%E5%B1%8B%E3%81%A7%E9%AD%94%E6%97%8F%E3%82%92%E3%83%96%E3%83%83%E5%80%92%E3%81%97%E3%81%BE%E3%81%99"
+    selectors:
+      episode_list: ".mod-episode-item"
+      episode_title: ".mod-episode-title"
+      episode_url: ".mod-episode-link"
+      episode_date: ".mod-episode-date"
+    wait_for: ".mod-episode-list"
