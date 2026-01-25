@@ -21,4 +21,20 @@ RSpec.describe FeedBuilder do
       expect(xml).to include("</rss>")
     end
   end
+
+  describe "#build with episodes" do
+    it "includes episodes as RSS items" do
+      episodes = [
+        { title: "第3話", url: "https://example.com/ep/3", date: "2026-01-25" },
+        { title: "第2話", url: "https://example.com/ep/2", date: "2026-01-20" }
+      ]
+      builder = FeedBuilder.new(site_config, episodes)
+      xml = builder.build
+
+      expect(xml).to include("<item>")
+      expect(xml).to include("<title>第3話</title>")
+      expect(xml).to include("<link>https://example.com/ep/3</link>")
+      expect(xml).to include("<pubDate>")
+    end
+  end
 end
