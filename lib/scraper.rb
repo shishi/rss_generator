@@ -36,8 +36,8 @@ class Scraper
       playwright.chromium.launch(**launch_options) do |browser|
         browser.new_context do |context|
           page = context.new_page
-          page.goto(@config["url"])
-          page.wait_for_selector(@config["wait_for"], timeout: 10000)
+          page.goto(@config["url"], timeout: 60000, waitUntil: "domcontentloaded")
+          page.wait_for_selector(@config["wait_for"], timeout: 30000)
 
           elements = page.query_selector_all(@config["selectors"]["episode_list"])
           episodes = extract_episodes(page, elements)

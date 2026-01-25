@@ -53,6 +53,16 @@
             at-spi2-atk
             at-spi2-core
             gtk3
+
+            # Virtual framebuffer for headless GUI testing (WSL2/CI)
+            xvfb-run
+            xorg.xorgserver
+
+            # Fonts for proper text rendering
+            fontconfig
+            noto-fonts
+            noto-fonts-cjk-sans
+            liberation_ttf
           ];
 
           shellHook = ''
@@ -60,12 +70,19 @@
             export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
             export CHROME_PATH="${pkgs.chromium}/bin/chromium"
 
+            # Font configuration for CJK support
+            export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
+            export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts"
+
             echo "RSS Generator development environment"
             echo "Ruby: $(ruby --version)"
             echo "Node: $(node --version)"
             echo "Chromium: $(chromium --version 2>/dev/null || echo 'available')"
             echo ""
             echo "Run 'bundle install' to install Ruby dependencies"
+            echo ""
+            echo "For WSL2/headless testing, use:"
+            echo "  xvfb-run bundle exec ruby bin/generate"
           '';
 
           # Set library path for Playwright
