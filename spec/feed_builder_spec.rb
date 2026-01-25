@@ -37,4 +37,20 @@ RSpec.describe FeedBuilder do
       expect(xml).to include("<pubDate>")
     end
   end
+
+  describe "#save" do
+    it "writes XML to specified file path" do
+      builder = FeedBuilder.new(site_config, [])
+      tmp_path = "tmp/test-feed.xml"
+      FileUtils.mkdir_p("tmp")
+
+      builder.save(tmp_path)
+
+      expect(File.exist?(tmp_path)).to be true
+      content = File.read(tmp_path)
+      expect(content).to include("<title>テスト漫画</title>")
+    ensure
+      FileUtils.rm_rf("tmp")
+    end
+  end
 end

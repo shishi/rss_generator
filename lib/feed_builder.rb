@@ -1,4 +1,5 @@
 require "builder"
+require "fileutils"
 require "time"
 
 class FeedBuilder
@@ -26,6 +27,12 @@ class FeedBuilder
         end
       end
     end
+  end
+
+  def save(path)
+    dir = File.dirname(path)
+    FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
+    File.write(path, build)
   end
 
   private
