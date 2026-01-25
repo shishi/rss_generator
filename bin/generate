@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../lib/rss_generator"
+
+# ヘルプ表示
+if ARGV.include?("--help") || ARGV.include?("-h")
+  puts <<~HELP
+    Usage: bin/generate [config_path] [output_dir]
+
+    Arguments:
+      config_path  Path to sites.yml (default: config/sites.yml)
+      output_dir   Output directory for RSS feeds (default: docs)
+
+    Examples:
+      bin/generate                           # Use defaults
+      bin/generate config/my-sites.yml       # Custom config
+      bin/generate config/sites.yml output   # Custom output dir
+  HELP
+  exit 0
+end
+
+config_path = ARGV[0] || "config/sites.yml"
+output_dir = ARGV[1] || "docs"
+
+puts "RSS Generator starting..."
+puts "Config: #{config_path}"
+puts "Output: #{output_dir}"
+puts "-" * 40
+
+RssGenerator.new(config_path, output_dir).run
+
+puts "-" * 40
+puts "Done!"
