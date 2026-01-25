@@ -30,7 +30,10 @@ class Scraper
     episodes = []
 
     Playwright.create(playwright_cli_executable_path: "npx playwright") do |playwright|
-      playwright.chromium.launch(headless: true) do |browser|
+      launch_options = { headless: true }
+      launch_options[:executablePath] = ENV["CHROME_PATH"] if ENV["CHROME_PATH"]
+
+      playwright.chromium.launch(**launch_options) do |browser|
         browser.new_context do |context|
           page = context.new_page
           page.goto(@config["url"])
