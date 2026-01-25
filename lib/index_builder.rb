@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "fileutils"
+
 class IndexBuilder
   def initialize(sites)
     @sites = sites
@@ -27,6 +29,12 @@ class IndexBuilder
       </body>
       </html>
     HTML
+  end
+
+  def save(path)
+    dir = File.dirname(path)
+    FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
+    File.write(path, build)
   end
 
   private

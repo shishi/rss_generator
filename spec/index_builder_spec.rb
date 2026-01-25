@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "fileutils"
 require_relative "../lib/index_builder"
 
 RSpec.describe IndexBuilder do
@@ -21,6 +22,22 @@ RSpec.describe IndexBuilder do
       expect(html).to include("漫画A")
       expect(html).to include('href="manga-b.xml"')
       expect(html).to include("漫画B")
+    end
+  end
+
+  describe "#save" do
+    it "writes HTML to specified file path" do
+      builder = IndexBuilder.new(sites)
+      tmp_path = "tmp/index.html"
+      FileUtils.mkdir_p("tmp")
+
+      builder.save(tmp_path)
+
+      expect(File.exist?(tmp_path)).to be true
+      content = File.read(tmp_path)
+      expect(content).to include("漫画A")
+    ensure
+      FileUtils.rm_rf("tmp")
     end
   end
 end
