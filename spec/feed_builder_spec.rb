@@ -9,6 +9,16 @@ RSpec.describe FeedBuilder do
     }
   end
 
+  # base_url指定ありの設定（SPAサイト向け）
+  let(:site_config_with_base_url) do
+    {
+      "name" => "SPA漫画",
+      "id" => "spa-manga",
+      "url" => "https://spa-example.com/manga/1/chapter/123",
+      "base_url" => "https://spa-example.com"
+    }
+  end
+
   describe "#build" do
     it "generates valid RSS 2.0 XML structure" do
       builder = FeedBuilder.new(site_config, [])
@@ -35,6 +45,49 @@ RSpec.describe FeedBuilder do
       expect(xml).to include("<title>第3話</title>")
       expect(xml).to include("<link>https://example.com/ep/3</link>")
       expect(xml).to include("<pubDate>")
+    end
+  end
+
+  describe "#build with relative URLs" do
+    it "converts relative URLs to absolute URLs using base_url" do
+      episodes = [
+        { title: "第1話", url: "/manga/1/chapter/100", date: "2026-01-25" }
+      ]
+      builder = FeedBuilder.new(site_config_with_base_url, episodes)
+      xml = builder.build
+
+      expect(xml).to include("<link>https://spa-example.com/manga/1/chapter/100</link>")
+      expect(xml).to include("<guid>https://spa-example.com/manga/1/chapter/100</guid>")
+    end
+
+    it "extracts base_url from url when base_url is not specified" do
+      episodes = [
+        { title: "第1話", url: "/ep/1", date: "2026-01-25" }
+      ]
+      builder = FeedBuilder.new(site_config, episodes)
+      xml = builder.build
+
+      expect(xml).to include("<link>https://example.com/ep/1</link>")
+    end
+
+    it "keeps absolute URLs unchanged" do
+      episodes = [
+        { title: "第1話", url: "https://other-site.com/ep/1", date: "2026-01-25" }
+      ]
+      builder = FeedBuilder.new(site_config, episodes)
+      xml = builder.build
+
+      expect(xml).to include("<link>https://other-site.com/ep/1</link>")
+    end
+
+    it "handles empty URLs gracefully" do
+      episodes = [
+        { title: "第1話", url: "", date: "2026-01-25" }
+      ]
+      builder = FeedBuilder.new(site_config, episodes)
+      xml = builder.build
+
+      expect(xml).to include("<link></link>")
     end
   end
 
