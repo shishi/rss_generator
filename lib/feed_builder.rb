@@ -1,11 +1,13 @@
 require "builder"
 require "fileutils"
 require "time"
+require "uri"
 
 class FeedBuilder
   def initialize(site_config, episodes)
     @config = site_config
     @episodes = episodes
+    @base_url = site_config["base_url"] || extract_base_url(site_config["url"])
   end
 
   def build
@@ -18,10 +20,11 @@ class FeedBuilder
         xml.description "#{@config["name"]} の更新情報"
 
         @episodes.each do |episode|
+          full_url = absolute_url(episode[:url])
           xml.item do
             xml.title episode[:title]
-            xml.link episode[:url]
-            xml.guid episode[:url]
+            xml.link full_url
+            xml.guid full_url
             xml.pubDate format_date(episode[:date])
           end
         end
@@ -36,6 +39,22 @@ class FeedBuilder
   end
 
   private
+
+  # URLからベースURL（スキーム + ホスト）を抽出
+  def extract_base_url(url)
+    uri = URI.parse(url)
+    "#{uri.scheme}://#{uri.host}"
+  rescue URI::InvalidURIError
+    url
+  end
+
+  # 相対URLを絶対URLに変換
+  def absolute_url(url)
+    return url if url.nil? || url.empty?
+    return url if url.start_with?("http://", "https://")
+
+    "#{@base_url}#{url}"
+  end
 
   def format_date(date_str)
     return Time.now.rfc2822 if date_str.nil? || date_str.empty?
