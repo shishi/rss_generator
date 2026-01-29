@@ -6,12 +6,58 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
       in
       {
+        # Test runner script - run with: nix run .#test
+        apps.test = {
+          type = "app";
+          program = toString (pkgs.writeShellScript "run-tests" ''
+            export PLAYWRIGHT_BROWSERS_PATH="${pkgs.chromium}/bin"
+            export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+            export CHROME_PATH="${pkgs.chromium}/bin/chromium"
+            export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
+            export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts"
+            export LD_LIBRARY_PATH="${
+              pkgs.lib.makeLibraryPath [
+                pkgs.glib
+                pkgs.nss
+                pkgs.nspr
+                pkgs.atk
+                pkgs.cups
+                pkgs.dbus
+                pkgs.expat
+                pkgs.libdrm
+                pkgs.libxkbcommon
+                pkgs.pango
+                pkgs.cairo
+                pkgs.alsa-lib
+                pkgs.mesa
+                pkgs.xorg.libX11
+                pkgs.xorg.libXcomposite
+                pkgs.xorg.libXdamage
+                pkgs.xorg.libXext
+                pkgs.xorg.libXfixes
+                pkgs.xorg.libXrandr
+                pkgs.xorg.libxcb
+                pkgs.at-spi2-atk
+                pkgs.at-spi2-core
+                pkgs.gtk3
+              ]
+            }"
+            exec ${pkgs.xvfb-run}/bin/xvfb-run ${pkgs.bundler}/bin/bundle exec rspec "$@"
+          '');
+        };
+
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             # Ruby
@@ -19,7 +65,7 @@
             bundler
 
             # Node.js (for Playwright)
-            nodejs_20
+            nodejs_22
 
             # Playwright dependencies for Chromium
             # These are required for headless Chrome to run
