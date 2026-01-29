@@ -9,3 +9,4 @@ sites:
       episode_url: ".mod-episode-link"
       episode_date: ".mod-episode-date"
     wait_for: ".mod-episode-list"
+    exclude_selector: "[data-is-free='false']"

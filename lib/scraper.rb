@@ -15,7 +15,8 @@ require "playwright"
 #       "episode_url" => "a",
 #       "episode_date" => ".date"
 #     },
-#     "wait_for" => ".episode-list"
+#     "wait_for" => ".episode-list",
+#     "exclude_selector" => "[data-is-free='false']"  # optional: 除外する要素のCSSセレクタ
 #   }
 #
 # 戻り値: [{ title: "第1話", url: "https://...", date: "2026-01-25" }, ...]
@@ -57,6 +58,8 @@ class Scraper
   private
 
   def extract_episodes(page, elements)
+    elements = filter_excluded_elements(elements) if @config["exclude_selector"]
+
     elements.map do |element|
       title_el = element.query_selector(@config["selectors"]["episode_title"])
       url_el = element.query_selector(@config["selectors"]["episode_url"])
@@ -68,5 +71,12 @@ class Scraper
         date: date_el&.text_content&.strip || ""
       }
     end.reject { |ep| ep[:title].empty? && ep[:url].empty? }
+  end
+
+  def filter_excluded_elements(elements)
+    exclude_selector = @config["exclude_selector"]
+    elements.reject do |element|
+      element.evaluate("el => el.matches(#{exclude_selector.to_json})")
+    end
   end
 end
