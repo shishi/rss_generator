@@ -187,3 +187,42 @@ sites:
         });
         return episodes;
       }
+
+  # ======================================
+  # typemoon.org - JavaScript評価モード
+  # 竹箒日記（奈須きのこ/武内崇の日記）
+  # ======================================
+  - name: "竹箒日記"
+    id: "typemoon-diary"
+    url: "http://www.typemoon.org/bbb/diary/"
+    base_url: "http://www.typemoon.org/bbb/diary/"
+    wait_seconds: 3
+    extraction_script: |
+      () => {
+        const episodes = [];
+        document.querySelectorAll('table.diary').forEach((table, index) => {
+          const titleRow = table.querySelector('tr.daytitle td');
+          if (!titleRow) return;
+
+          const titleText = titleRow.textContent.trim();
+          // "2026/1/1 : タイトル（きのこ）■" からパース
+          const match = titleText.match(/^(\d{4}\/\d{1,2}\/\d{1,2})\s*:\s*(.+?)(?:■|$)/);
+          if (!match) return;
+
+          const date = match[1].replace(/\//g, '-');
+          const title = match[2].trim();
+
+          // 目次のリンクからアンカーを取得
+          const tocLinks = document.querySelectorAll('table.daytitle a[href^="#"]');
+          let url = '';
+          tocLinks.forEach(link => {
+            if (link.textContent.includes(title.substring(0, 10))) {
+              url = link.getAttribute('href');
+            }
+          });
+          if (!url) url = '#' + (index + 1);
+
+          episodes.push({ title, url, date });
+        });
+        return episodes;
+      }
