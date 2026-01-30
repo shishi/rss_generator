@@ -74,7 +74,7 @@
               export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
               export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts"
               export LD_LIBRARY_PATH="${ldLibraryPath}"
-              exec ${pkgs.xvfb-run}/bin/xvfb-run ${gems}/bin/ruby bin/generate "$@"
+              exec ${pkgs.xvfb-run}/bin/xvfb-run ${gems.wrappedRuby}/bin/ruby bin/generate "$@"
             '');
           };
         };
