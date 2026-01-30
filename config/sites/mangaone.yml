@@ -1,0 +1,47 @@
+# manga-one.com - JavaScript評価モード
+# SPAサイトのためカスタムスクリプトで抽出
+sites:
+  - name: "雷雷雷"
+    id: "mangaone-rairairai"
+    url: "https://manga-one.com/manga/2341/chapter/212119"
+    base_url: "https://manga-one.com"
+    manga_id: "2341"
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    wait_seconds: 8
+    extraction_script: |
+      () => {
+        const mangaId = "2341";
+        const episodes = [];
+        const cards = document.querySelectorAll('div.cursor-pointer');
+
+        cards.forEach(card => {
+          const titleP = card.querySelector('p.font-bold');
+          if (!titleP) return;
+
+          const title = titleP.textContent.trim();
+          if (!title.match(/第\d+話/)) return;
+
+          const subtitleP = titleP.parentElement.querySelector('p:not(.font-bold)');
+          const subtitle = subtitleP ? subtitleP.textContent.trim() : '';
+
+          const dateP = card.querySelector('p.text-gray-700');
+          const date = dateP ? dateP.textContent.trim() : '';
+
+          const img = card.querySelector('img[src*="/chapter/"]');
+          let chapterId = '';
+          if (img) {
+            const match = img.src.match(/\/chapter\/(\d+)\.webp/);
+            if (match) chapterId = match[1];
+          }
+
+          const url = chapterId ? '/manga/' + mangaId + '/chapter/' + chapterId : '';
+
+          episodes.push({
+            title: title + (subtitle ? ' ' + subtitle : ''),
+            url: url,
+            date: date
+          });
+        });
+
+        return episodes;
+      }
