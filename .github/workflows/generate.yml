@@ -35,11 +35,16 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Setup Cachix
-        uses: cachix/cachix-action@v16
+      - name: Cache Nix store
+        uses: actions/cache@v4
         with:
-          name: nix-community
-          # For public read-only cache, no auth needed
+          path: |
+            /nix/store
+            /nix/var/nix/db
+            /nix/var/nix/profiles
+          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock', 'gemset.nix') }}
+          restore-keys: |
+            nix-${{ runner.os }}-
 
       - name: Generate feeds
         run: nix develop -c xvfb-run ruby bin/generate
