@@ -85,15 +85,15 @@ sites:
 
 ## GitHub Actions
 
-毎日 18:00 JST に自動実行され、`output/` ディレクトリを更新してコミット。
+毎日 18:00 JST に自動実行され、RSS フィードを生成して GitHub Pages に自動デプロイ。
 
 手動実行：Actions タブから "Run workflow" をクリック。
 
 ### GitHub Pages 設定
 
 1. Settings → Pages
-2. Source: "Deploy from a branch"
-3. Branch: `main` (or `master`) / `output`
+2. Source: "GitHub Actions"
+3. ワークフローが自動的に `output/` ディレクトリをデプロイします
 
 ## 開発
 

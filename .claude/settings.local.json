@@ -16,7 +16,12 @@
       "Bash(ls:*)",
       "Bash(tree:*)",
       "Bash(test:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(bundle exec ruby:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git ls-tree:*)"
     ]
   }
 }
