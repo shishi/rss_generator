@@ -32,14 +32,22 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Setup Nix cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
-
-      - name: Cache Ruby gems
+      - name: Cache Nix store
         uses: nix-community/cache-nix-action@v6
         with:
-          primary-key: gems-${{ hashFiles('Gemfile.lock') }}
-          paths: vendor/bundle
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          paths: |
+            ~/.nix-profile
+          purge: true
+          purge-created: 604800
+
+      - name: Cache Ruby gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
 
       - name: Install Ruby gems
         run: nix develop -c bundle config set --local path vendor/bundle && nix develop -c bundle install
