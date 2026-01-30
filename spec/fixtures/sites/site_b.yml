@@ -1,0 +1,10 @@
+sites:
+  - name: "Test Site B"
+    id: "test-b"
+    url: "https://example.com/b"
+    selectors:
+      episode_list: ".list"
+      episode_title: ".title"
+      episode_url: "a"
+      episode_date: ".date"
+    wait_for: ".list"

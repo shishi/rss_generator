@@ -41,7 +41,21 @@ class RssGenerator
   private
 
   def load_config
-    config = YAML.load_file(@config_path)
+    if File.directory?(@config_path)
+      load_config_from_directory
+    else
+      load_config_from_file(@config_path)
+    end
+  end
+
+  def load_config_from_directory
+    Dir.glob(File.join(@config_path, "*.yml")).sort.flat_map do |file|
+      load_config_from_file(file)
+    end
+  end
+
+  def load_config_from_file(path)
+    config = YAML.load_file(path, aliases: true)
     config["sites"] || []
   end
 end
