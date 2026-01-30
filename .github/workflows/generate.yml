@@ -35,22 +35,14 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      # Option A: Nix-managed gems (no caching needed, all in flake)
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v16
+        with:
+          name: nix-community
+          # For public read-only cache, no auth needed
+
       - name: Generate feeds (Nix)
         run: nix run .#generate
-
-      # Option B: Bundler-managed gems (kept for comparison, can remove later)
-      # - name: Cache Ruby gems
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: vendor/bundle
-      #     key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-gems-
-      # - name: Install Ruby gems
-      #   run: nix develop -c bundle config set --local path vendor/bundle && nix develop -c bundle install
-      # - name: Generate feeds (Bundler)
-      #   run: nix develop -c xvfb-run bundle exec ruby bin/generate
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
