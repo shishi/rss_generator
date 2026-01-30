@@ -44,17 +44,24 @@ lib/
   rss_generator.rb # Main orchestrator
   index_builder.rb # HTML index generation
 config/
-  sites.yml        # Site configurations
+  sites/           # Site configurations (split by domain)
+    yanmaga.yml
+    mangaone.yml
+    corocoro.yml
+    typemoon.yml
 spec/
   *_spec.rb        # RSpec tests
-docs/
+output/
   *.xml            # Generated RSS feeds
   index.html       # Feed index page
+docs/
+  *.md             # Design documents
 ```
 
 ## Site Configuration
 
-Two scraping modes are supported in `config/sites.yml`:
+Site configs are split by domain in `config/sites/`. Each file contains a `sites:` array.
+YAML anchors (`&name` / `*name`) can be used to share extraction scripts within a file.
 
 ### Standard Mode (CSS Selectors)
 For sites with static HTML structure:

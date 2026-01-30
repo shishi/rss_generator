@@ -9,18 +9,21 @@ if ARGV.include?("--help") || ARGV.include?("-h")
     Usage: bin/generate [config_path] [output_dir]
 
     Arguments:
-      config_path  Path to sites.yml (default: config/sites.yml)
+      config_path  Path to config file or directory (default: config/sites)
+                   - File: single YAML file with sites array
+                   - Directory: loads all *.yml files alphabetically
       output_dir   Output directory for RSS feeds (default: output)
 
     Examples:
-      bin/generate                           # Use defaults
-      bin/generate config/my-sites.yml       # Custom config
-      bin/generate config/sites.yml output   # Custom output dir
+      bin/generate                           # Use defaults (config/sites/)
+      bin/generate config/sites.yml          # Single config file
+      bin/generate config/sites              # Directory of config files
+      bin/generate config/sites output       # Custom output dir
   HELP
   exit 0
 end
 
-config_path = ARGV[0] || "config/sites.yml"
+config_path = ARGV[0] || "config/sites"
 output_dir = ARGV[1] || "output"
 
 puts "RSS Generator starting..."
