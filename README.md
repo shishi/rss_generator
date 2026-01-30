@@ -2,6 +2,8 @@
 
 漫画サイトをスクレイピングして RSS フィードを生成するツール。
 
+🔗 **フィード一覧**: https://shishi.github.io/rss_generator/
+
 ## 機能
 
 - JavaScript レンダリングが必要なサイトに対応（Playwright 使用）
