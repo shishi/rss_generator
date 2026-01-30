@@ -5,7 +5,18 @@
       "Bash(gh repo view:*)",
       "Bash(gh api:*)",
       "Bash(gh workflow run:*)",
-      "Bash(gh run list:*)"
+      "Bash(gh run list:*)",
+      "Bash(nix develop:*)",
+      "Bash(git -C /home/shishi/dev/src/github.com/shishi/rss_generator log --oneline -5)",
+      "Bash(git -C /home/shishi/dev/src/github.com/shishi/rss_generator status)",
+      "Bash(git -C /home/shishi/dev/src/github.com/shishi/rss_generator diff)",
+      "Bash(git -C /home/shishi/dev/src/github.com/shishi/rss_generator log --oneline -3)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(test:*)",
+      "Bash(git mv:*)"
     ]
   }
 }
