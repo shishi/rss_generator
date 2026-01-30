@@ -10,7 +10,7 @@ if ARGV.include?("--help") || ARGV.include?("-h")
 
     Arguments:
       config_path  Path to sites.yml (default: config/sites.yml)
-      output_dir   Output directory for RSS feeds (default: docs)
+      output_dir   Output directory for RSS feeds (default: output)
 
     Examples:
       bin/generate                           # Use defaults
@@ -21,7 +21,7 @@ if ARGV.include?("--help") || ARGV.include?("-h")
 end
 
 config_path = ARGV[0] || "config/sites.yml"
-output_dir = ARGV[1] || "docs"
+output_dir = ARGV[1] || "output"
 
 puts "RSS Generator starting..."
 puts "Config: #{config_path}"
