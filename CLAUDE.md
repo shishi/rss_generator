@@ -4,27 +4,30 @@
 
 This project uses **Nix flakes** for development environment management.
 
-### Automatic Environment Setup
+### ⚠️ IMPORTANT: Claude Code / AI Agent Environment
+
+**Claude Code does NOT have direnv loaded.** Always use `nix develop -c` prefix:
+
+```bash
+# ✅ CORRECT - Always use this pattern:
+nix develop -c bundle exec rspec
+nix develop -c xvfb-run bundle exec ruby bin/generate
+
+# ❌ WRONG - Will fail without Nix environment:
+bundle exec rspec
+xvfb-run bundle exec ruby bin/generate
+```
+
+**Playwright requires:**
+1. `nix develop -c` for Chromium and system libraries
+2. `xvfb-run` for headless browser (WSL2/CI)
+3. `CHROME_PATH` environment variable (set automatically by flake.nix)
+
+### Human Developer Environment (with direnv)
 - `direnv` is configured with `.envrc` (`use flake`)
 - When you `cd` into this directory, the flake environment is automatically loaded
 - Run `direnv allow` if prompted
-
-### Running Commands
-```bash
-# With direnv (automatic):
-bundle exec ruby bin/generate
-bundle exec rspec
-
-# Without direnv (manual):
-nix develop -c bundle exec ruby bin/generate
-nix develop -c xvfb-run bundle exec rspec
-```
-
-### Headless Browser Testing (WSL2/CI)
-Use `xvfb-run` for Playwright/Chromium:
-```bash
-xvfb-run bundle exec ruby bin/generate
-```
+- With direnv active, you can run commands directly: `bundle exec rspec`
 
 ## Testing
 
