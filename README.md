@@ -80,12 +80,12 @@ sites:
 
 ## 出力
 
-- `docs/*.xml` - 各サイトの RSS フィード
-- `docs/index.html` - フィード一覧ページ
+- `output/*.xml` - 各サイトの RSS フィード
+- `output/index.html` - フィード一覧ページ
 
 ## GitHub Actions
 
-毎日 18:00 JST に自動実行され、`docs/` ディレクトリを更新してコミット。
+毎日 18:00 JST に自動実行され、`output/` ディレクトリを更新してコミット。
 
 手動実行：Actions タブから "Run workflow" をクリック。
 
@@ -93,7 +93,7 @@ sites:
 
 1. Settings → Pages
 2. Source: "Deploy from a branch"
-3. Branch: `main` (or `master`) / `docs`
+3. Branch: `main` (or `master`) / `output`
 
 ## 開発
 
@@ -111,7 +111,8 @@ bundle exec rspec
 │   └── generate          # エントリーポイント
 ├── config/
 │   └── sites.yml         # サイト設定
-├── docs/                  # 生成された RSS フィード
+├── docs/                  # 設計ドキュメント
+├── output/                # 生成された RSS フィード（GitHub Pages）
 ├── lib/
 │   ├── feed_builder.rb   # RSS XML 生成
 │   ├── index_builder.rb  # index.html 生成
