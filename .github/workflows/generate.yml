@@ -41,8 +41,8 @@ jobs:
           name: nix-community
           # For public read-only cache, no auth needed
 
-      - name: Generate feeds (Nix)
-        run: nix run .#generate
+      - name: Generate feeds
+        run: nix develop -c xvfb-run ruby bin/generate
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
