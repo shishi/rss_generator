@@ -97,3 +97,93 @@ sites:
         });
         return episodes;
       }
+
+  - name: "炎の闘球女 ドッジ弾子"
+    id: "corocoro-dodge-danko"
+    url: "https://www.corocoro.jp/title/5"
+    base_url: "https://www.corocoro.jp"
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    wait_seconds: 5
+    extraction_script: |
+      () => {
+        const episodes = [];
+        document.querySelectorAll('ul.divide-y').forEach(list => {
+          list.querySelectorAll(':scope > li').forEach(item => {
+            const img = item.querySelector('img[alt]');
+            if (!img) return;
+
+            const title = img.alt.replace(/\s*の話サムネイル$/, '').trim();
+            if (!title) return;
+
+            const srcMatch = img.src.match(/\/chapter\/(\d+)\.webp/);
+            const chapterId = srcMatch ? srcMatch[1] : '';
+            const url = chapterId ? '/chapter/' + chapterId + '/viewer' : '';
+
+            const dateMatch = item.textContent.match(/(\d{4}\/\d{2}\/\d{2})/);
+            const date = dateMatch ? dateMatch[1].replace(/\//g, '-') : '';
+
+            episodes.push({ title, url, date });
+          });
+        });
+        return episodes;
+      }
+
+  - name: "にじさんじ ベラボウ"
+    id: "corocoro-nijisanji"
+    url: "https://www.corocoro.jp/title/62"
+    base_url: "https://www.corocoro.jp"
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    wait_seconds: 5
+    extraction_script: |
+      () => {
+        const episodes = [];
+        document.querySelectorAll('ul.divide-y').forEach(list => {
+          list.querySelectorAll(':scope > li').forEach(item => {
+            const img = item.querySelector('img[alt]');
+            if (!img) return;
+
+            const title = img.alt.replace(/\s*の話サムネイル$/, '').trim();
+            if (!title) return;
+
+            const srcMatch = img.src.match(/\/chapter\/(\d+)\.webp/);
+            const chapterId = srcMatch ? srcMatch[1] : '';
+            const url = chapterId ? '/chapter/' + chapterId + '/viewer' : '';
+
+            const dateMatch = item.textContent.match(/(\d{4}\/\d{2}\/\d{2})/);
+            const date = dateMatch ? dateMatch[1].replace(/\//g, '-') : '';
+
+            episodes.push({ title, url, date });
+          });
+        });
+        return episodes;
+      }
+
+  - name: "ダウナーお姉さんは遊びたい"
+    id: "corocoro-downer-oneesan"
+    url: "https://www.corocoro.jp/title/149"
+    base_url: "https://www.corocoro.jp"
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    wait_seconds: 5
+    extraction_script: |
+      () => {
+        const episodes = [];
+        document.querySelectorAll('ul.divide-y').forEach(list => {
+          list.querySelectorAll(':scope > li').forEach(item => {
+            const img = item.querySelector('img[alt]');
+            if (!img) return;
+
+            const title = img.alt.replace(/\s*の話サムネイル$/, '').trim();
+            if (!title) return;
+
+            const srcMatch = img.src.match(/\/chapter\/(\d+)\.webp/);
+            const chapterId = srcMatch ? srcMatch[1] : '';
+            const url = chapterId ? '/chapter/' + chapterId + '/viewer' : '';
+
+            const dateMatch = item.textContent.match(/(\d{4}\/\d{2}\/\d{2})/);
+            const date = dateMatch ? dateMatch[1].replace(/\//g, '-') : '';
+
+            episodes.push({ title, url, date });
+          });
+        });
+        return episodes;
+      }
