@@ -35,16 +35,8 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Cache Nix store
-        uses: actions/cache@v4
-        with:
-          path: |
-            /nix/store
-            /nix/var/nix/db
-            /nix/var/nix/profiles
-          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock', 'gemset.nix') }}
-          restore-keys: |
-            nix-${{ runner.os }}-
+      - name: Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Generate feeds
         run: nix develop -c xvfb-run ruby bin/generate
