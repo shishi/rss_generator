@@ -42,6 +42,12 @@ jobs:
           restore-prefixes-first-match: nix-
           gc-max-store-size-linux: 2G
 
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-${{ hashFiles('package-lock.json') }}
+
       - name: Generate feeds
         run: nix develop -c xvfb-run ruby bin/generate
 
