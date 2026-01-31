@@ -16,134 +16,105 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+
         gems = pkgs.bundlerEnv {
           name = "rss-generator-gems";
           ruby = pkgs.ruby_3_3;
           gemdir = ./.;
         };
-        # Common library path for Chromium
-        ldLibraryPath = pkgs.lib.makeLibraryPath [
-          pkgs.glib
-          pkgs.nss
-          pkgs.nspr
-          pkgs.atk
-          pkgs.cups
-          pkgs.dbus
-          pkgs.expat
-          pkgs.libdrm
-          pkgs.libxkbcommon
-          pkgs.pango
-          pkgs.cairo
-          pkgs.alsa-lib
-          pkgs.mesa
-          pkgs.xorg.libX11
-          pkgs.xorg.libXcomposite
-          pkgs.xorg.libXdamage
-          pkgs.xorg.libXext
-          pkgs.xorg.libXfixes
-          pkgs.xorg.libXrandr
-          pkgs.xorg.libxcb
-          pkgs.at-spi2-atk
-          pkgs.at-spi2-core
-          pkgs.gtk3
+
+        # Shared system libraries for Chromium/Playwright
+        chromiumLibs = with pkgs; [
+          glib
+          nss
+          nspr
+          atk
+          cups
+          dbus
+          expat
+          libdrm
+          libxkbcommon
+          pango
+          cairo
+          alsa-lib
+          mesa
+          xorg.libX11
+          xorg.libXcomposite
+          xorg.libXdamage
+          xorg.libXext
+          xorg.libXfixes
+          xorg.libXrandr
+          xorg.libxcb
+          at-spi2-atk
+          at-spi2-core
+          gtk3
         ];
+
+        ldLibraryPath = pkgs.lib.makeLibraryPath chromiumLibs;
+
+        # Common environment variables for Playwright
+        playwrightEnv = ''
+          export PLAYWRIGHT_BROWSERS_PATH="${pkgs.chromium}/bin"
+          export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+          export CHROME_PATH="${pkgs.chromium}/bin/chromium"
+          export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
+          export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts"
+          export LD_LIBRARY_PATH="${ldLibraryPath}"
+        '';
+
+        # npm install check for Playwright
+        npmInstallCheck = ''
+          if [ ! -d "node_modules" ]; then
+            ${pkgs.nodejs_22}/bin/npm install --silent
+          fi
+        '';
+
+        # Helper to create app scripts
+        mkApp = name: script: {
+          type = "app";
+          program = toString (pkgs.writeShellScript name ''
+            ${playwrightEnv}
+            ${npmInstallCheck}
+            ${script}
+          '');
+        };
       in
       {
         apps = {
-          # Test runner script - run with: nix run .#test
-          test = {
-            type = "app";
-            program = toString (pkgs.writeShellScript "run-tests" ''
-              export PLAYWRIGHT_BROWSERS_PATH="${pkgs.chromium}/bin"
-              export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-              export CHROME_PATH="${pkgs.chromium}/bin/chromium"
-              export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
-              export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts"
-              export LD_LIBRARY_PATH="${ldLibraryPath}"
-              exec ${pkgs.xvfb-run}/bin/xvfb-run ${gems}/bin/rspec "$@"
-            '');
-          };
+          test = mkApp "run-tests" ''
+            exec ${pkgs.xvfb-run}/bin/xvfb-run ${gems}/bin/rspec "$@"
+          '';
 
-          # Generate RSS feeds - run with: nix run .#generate
-          generate = {
-            type = "app";
-            program = toString (pkgs.writeShellScript "generate-feeds" ''
-              export PLAYWRIGHT_BROWSERS_PATH="${pkgs.chromium}/bin"
-              export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-              export CHROME_PATH="${pkgs.chromium}/bin/chromium"
-              export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
-              export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts"
-              export LD_LIBRARY_PATH="${ldLibraryPath}"
-              exec ${pkgs.xvfb-run}/bin/xvfb-run ${gems.wrappedRuby}/bin/ruby bin/generate "$@"
-            '');
-          };
+          generate = mkApp "generate-feeds" ''
+            exec ${pkgs.xvfb-run}/bin/xvfb-run ${gems.wrappedRuby}/bin/ruby bin/generate "$@"
+          '';
         };
 
         devShells.default = pkgs.mkShell {
           buildInputs = [
-            # Ruby with gems managed by Nix
             gems
             gems.wrappedRuby
-
-            # Also keep bundler for development (updating Gemfile)
             pkgs.bundler
+            pkgs.nodejs_22
+            pkgs.chromium
+            pkgs.xvfb-run
+            pkgs.xorg.xorgserver
+            pkgs.fontconfig
+            pkgs.noto-fonts
+            pkgs.noto-fonts-cjk-sans
+            pkgs.liberation_ttf
+          ] ++ chromiumLibs;
 
-          ] ++ (with pkgs; [
-            # Node.js (for Playwright)
-            nodejs_22
-
-            # Playwright dependencies for Chromium
-            # These are required for headless Chrome to run
-            chromium
-
-            # System libraries needed by Playwright/Chromium
-            glib
-            nss
-            nspr
-            atk
-            cups
-            dbus
-            expat
-            libdrm
-            libxkbcommon
-            pango
-            cairo
-            alsa-lib
-            mesa
-
-            # X11 libraries
-            xorg.libX11
-            xorg.libXcomposite
-            xorg.libXdamage
-            xorg.libXext
-            xorg.libXfixes
-            xorg.libXrandr
-            xorg.libxcb
-
-            # Additional dependencies
-            at-spi2-atk
-            at-spi2-core
-            gtk3
-
-            # Virtual framebuffer for headless GUI testing (WSL2/CI)
-            xvfb-run
-            xorg.xorgserver
-
-            # Fonts for proper text rendering
-            fontconfig
-            noto-fonts
-            noto-fonts-cjk-sans
-            liberation_ttf
-          ]);
+          LD_LIBRARY_PATH = ldLibraryPath;
 
           shellHook = ''
-            export PLAYWRIGHT_BROWSERS_PATH="${pkgs.chromium}/bin"
-            export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-            export CHROME_PATH="${pkgs.chromium}/bin/chromium"
+            ${playwrightEnv}
 
-            # Font configuration for CJK support
-            export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
-            export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts"
+            # Install Playwright npm package if node_modules doesn't exist
+            if [ ! -d "node_modules" ]; then
+              echo "Installing Playwright npm package..."
+              npm install --silent
+            fi
 
             echo "RSS Generator development environment"
             echo "Ruby: $(ruby --version)"
@@ -158,9 +129,6 @@
             echo "  nix run .#test      - Run tests"
             echo "  xvfb-run ruby bin/generate  - Direct run (devShell)"
           '';
-
-          # Set library path for Playwright
-          LD_LIBRARY_PATH = ldLibraryPath;
         };
       }
     );
