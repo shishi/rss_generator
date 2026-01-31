@@ -35,12 +35,14 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Cache Nix store
-        uses: nix-community/cache-nix-action@v6
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v15
         with:
-          primary-key: nix-${{ hashFiles('flake.lock', 'gemset.nix') }}
-          restore-prefixes-first-match: nix-
-          gc-max-store-size-linux: 2G
+          name: shishi-rss-generator
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build devShell (for caching)
+        run: nix build .#devShells.x86_64-linux.default.inputDerivation --no-link
 
       - name: Generate feeds
         run: nix develop -c xvfb-run ruby bin/generate
