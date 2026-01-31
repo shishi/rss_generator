@@ -21,7 +21,16 @@
       "Bash(bundle exec ruby:*)",
       "Bash(git push:*)",
       "Bash(git pull:*)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "WebFetch(domain:www.corocoro.jp)",
+      "Bash(xvfb-run bundle exec ruby:*)",
+      "WebFetch(domain:www.typemoon.org)",
+      "Bash(gh run view:*)",
+      "WebSearch",
+      "Bash(nix-shell:*)",
+      "Bash(nix flake check:*)",
+      "Bash(nix path-info:*)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
