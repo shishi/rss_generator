@@ -30,7 +30,14 @@
       "Bash(nix-shell:*)",
       "Bash(nix flake check:*)",
       "Bash(nix path-info:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:dream2nix.dev)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:johns.codes)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(git checkout:*)",
+      "Bash(gh cache list:*)"
     ]
   }
 }
