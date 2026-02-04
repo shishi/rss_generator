@@ -59,3 +59,11 @@ sites:
     user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     wait_seconds: 8
     extraction_script: *comic_walker_script
+
+  - name: "鍋に弾丸を受けながら"
+    id: "comic-walker-nabe-ni-dangan"
+    url: "https://comic-walker.com/detail/KC_003969_S?episodeType=latest"
+    base_url: "https://comic-walker.com"
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    wait_seconds: 8
+    extraction_script: *comic_walker_script
