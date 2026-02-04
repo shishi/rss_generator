@@ -1,0 +1,61 @@
+# comic-walker.com - JavaScript評価モード
+# Next.js製SPAのためカスタムスクリプトで抽出
+#
+# 共通の抽出スクリプト:
+# - ul[class*="EpisodesTabContents_episodeList"] 内の li 要素からエピソード情報を抽出
+# - a[class*="EpisodeThumbnail_episodeThumbnail"] からリンク取得
+# - テキストから日付(YYYY/MM/DD)とタイトルを抽出
+
+sites:
+  - name: "アイドルマスター シャイニーカラーズ コヒーレントライト"
+    id: "comic-walker-shinycolors-coherentlight"
+    url: "https://comic-walker.com/detail/KC_005662_S?episodeType=latest"
+    base_url: "https://comic-walker.com"
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    wait_seconds: 8
+    extraction_script: &comic_walker_script |
+      () => {
+        const episodeList = document.querySelector('ul[class*="EpisodesTabContents_episodeList"]');
+        if (!episodeList) return [];
+
+        const episodes = [];
+        const items = episodeList.querySelectorAll(':scope > li');
+
+        items.forEach(li => {
+          const link = li.querySelector('a[class*="EpisodeThumbnail_episodeThumbnail"]');
+          if (!link) return;
+
+          const href = link.getAttribute('href') || '';
+          const text = link.textContent || '';
+
+          // 日付を抽出 (YYYY/MM/DD形式 -> YYYY-MM-DD)
+          const dateMatch = text.match(/(\d{4})\/(\d{2})\/(\d{2})/);
+          const date = dateMatch ? dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3] : '';
+
+          // タイトルを抽出 (YYYY年MM月DD日より後の部分)
+          const titleMatch = text.match(/\d{4}年\d{2}月\d{2}日(.+)$/);
+          const title = titleMatch ? titleMatch[1].trim() : '';
+
+          if (title && href) {
+            episodes.push({ title, url: href, date });
+          }
+        });
+
+        return episodes;
+      }
+
+  - name: "崩壊世界の魔法杖職人"
+    id: "comic-walker-houkai-mahotsue"
+    url: "https://comic-walker.com/detail/KC_007107_S?episodeType=latest"
+    base_url: "https://comic-walker.com"
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    wait_seconds: 8
+    extraction_script: *comic_walker_script
+
+  - name: "衛宮さんちの今日のごはん"
+    id: "comic-walker-emiya-gohan"
+    url: "https://comic-walker.com/detail/KC_004033_S?episodeType=latest"
+    base_url: "https://comic-walker.com"
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    wait_seconds: 8
+    extraction_script: *comic_walker_script

@@ -37,7 +37,10 @@
       "Bash(grep:*)",
       "Bash(cat:*)",
       "Bash(git checkout:*)",
-      "Bash(gh cache list:*)"
+      "Bash(gh cache list:*)",
+      "Skill(superpowers-chrome:browsing)",
+      "mcp__plugin_superpowers-chrome_chrome__use_browser",
+      "WebFetch(domain:comic-walker.com)"
     ]
   }
 }
