@@ -41,7 +41,8 @@
       "Skill(superpowers-chrome:browsing)",
       "mcp__plugin_superpowers-chrome_chrome__use_browser",
       "WebFetch(domain:comic-walker.com)",
-      "Skill(git:commit)"
+      "Skill(git:commit)",
+      "WebFetch(domain:www.ganganonline.com)"
     ]
   }
 }

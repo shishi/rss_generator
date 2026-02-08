@@ -1,0 +1,49 @@
+# ganganonline.com - JavaScript評価モード
+# Next.js製SPAのため__NEXT_DATA__のJSONからエピソード情報を抽出
+#
+# 共通の抽出スクリプト:
+# - __NEXT_DATA__ scriptタグからページデータを取得
+# - chapters配列からstatus:3(次回予告)とstatus:2(アプリ限定)を除外
+# - publishingPeriod(YYYY.MM.DD〜YYYY.MM.DD)から公開日を抽出
+
+sites:
+  - name: "ブルーアーカイブ ゲーム開発部だいぼうけん!"
+    id: "ganganonline-bluearchive-gamedev"
+    url: "https://www.ganganonline.com/title/1851"
+    base_url: "https://www.ganganonline.com"
+    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    wait_seconds: 8
+    extraction_script: &ganganonline_script |
+      () => {
+        const dataEl = document.getElementById('__NEXT_DATA__');
+        if (!dataEl) return [];
+
+        const data = JSON.parse(dataEl.textContent);
+        const d = data.props?.pageProps?.data?.default || {};
+        const chapters = d.chapters || [];
+        const titleId = d.titleId || '';
+
+        const episodes = [];
+
+        chapters.forEach(ch => {
+          // status:3 = 次回予告, status:2 = アプリ限定 → スキップ
+          if (ch.status === 3 || ch.status === 2) return;
+
+          const title = [ch.mainText, ch.subText].filter(Boolean).join(' ');
+          const url = titleId && ch.id ? '/title/' + titleId + '/chapter/' + ch.id : '';
+
+          let date = '';
+          if (ch.publishingPeriod) {
+            const match = ch.publishingPeriod.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+            if (match) {
+              date = match[1] + '-' + match[2] + '-' + match[3];
+            }
+          }
+
+          if (title && url) {
+            episodes.push({ title, url, date });
+          }
+        });
+
+        return episodes;
+      }
