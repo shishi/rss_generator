@@ -1,4 +1,21 @@
 # yanmaga.jp - 標準CSSセレクターモード
+#
+# 無料判定に `data-is-free` を使ってはいけない。
+# この属性は「初回無料 / 待つと無料」プログラムの対象かを表すもので、
+# 期間限定無料キャンペーン（`90 → 無料` 表示）は data-is-free="false" になる。
+# つまり今すぐ無料で読める最新話ほど false 側に落ちる。
+# 実際の状態は料金ブロックの class に出る:
+#   .mod-episode-point--free.by_first_time  初回無料
+#   .mod-episode-point--free.by_wait        待つと無料（今すぐは有料）
+#   .mod-episode-campaign .mod-episode-point--free  期間限定無料
+# 未公開話（.mod-episode-nopublic）は料金ブロックを持たない。
+# よって「無料バッジが無いものを除外」で、未公開と完全有料だけを落とす。
+#
+# このセレクタは否定形なので fail-closed である。料金ブロックの class 名が変わると
+# 全件が除外され 0 件になり、RssGenerator が exit 1 する。CI ではそこで止まって
+# deploy step に進まないため、全フィードが前回の配信内容で据え置かれる。
+# 旧セレクタ（item 自身の属性を見る形）は同じ変化で fail-open、つまり全件通過して
+# 静かに内容が変わっていた。ここでは黙って変わるより赤くなる方を選んでいる。
 sites:
   - name: "聖巡エクスタシー"
     id: "yanmaga-seijun"
@@ -9,7 +26,7 @@ sites:
       episode_url: ".mod-episode-link"
       episode_date: ".mod-episode-date"
     wait_for: ".mod-episode-list"
-    exclude_selector: "[data-is-free='false']"
+    exclude_selector: ":not(:has(.mod-episode-point--free))"
 
   - name: "MADE IN YAMATO"
     id: "yanmaga-made-in-yamato"
@@ -20,4 +37,4 @@ sites:
       episode_url: ".mod-episode-link"
       episode_date: ".mod-episode-date"
     wait_for: ".mod-episode-list"
-    exclude_selector: "[data-is-free='false']"
+    exclude_selector: ":not(:has(.mod-episode-point--free))"
