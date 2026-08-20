@@ -18,7 +18,7 @@ require "playwright"
 #       "episode_date" => ".date"
 #     },
 #     "wait_for" => ".episode-list",
-#     "exclude_selector" => "[data-is-free='false']"  # optional: 除外する要素のCSSセレクタ
+#     "exclude_selector" => ":not(:has(.free-badge))"  # optional: 除外する要素のCSSセレクタ（:has() 可）
 #   }
 #
 # 【JavaScript評価モード: SPAサイト向け】

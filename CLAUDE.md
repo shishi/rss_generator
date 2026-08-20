@@ -75,7 +75,7 @@ For sites with static HTML structure:
     episode_url: "a"
     episode_date: ".date"
   wait_for: ".episode-list"
-  exclude_selector: "[data-is-free='false']"  # optional
+  exclude_selector: ":not(:has(.free-badge))"  # optional（el.matches() に渡されるので :has() が使える）
 ```
 
 ### JavaScript Evaluation Mode (SPA Sites)
