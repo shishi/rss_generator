@@ -5,12 +5,19 @@ sites:
     id: "mangaone-rairairai"
     url: "https://manga-one.com/manga/2341/chapter/212119"
     base_url: "https://manga-one.com"
-    manga_id: "2341"
     user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     wait_seconds: 8
     extraction_script: |
       () => {
-        const mangaId = "2341";
+        // manga ID は URL から取る。config と script の二重定義を避けるため。
+        // 取れなければ 0 件を返す。0 件のサイトは RssGenerator が errors に積み、
+        // 他サイトの生成は続行したうえで最後に exit 1 する。CI では generate step が
+        // 失敗して deploy step に進まないため、全フィードが前回の配信内容で据え置かれる。
+        // 壊れた URL を配信するより据え置きの方が気付ける、という判断。
+        const idMatch = location.pathname.match(/\/manga\/(\d+)/);
+        if (!idMatch) return [];
+        const mangaId = idMatch[1];
+
         const episodes = [];
         const cards = document.querySelectorAll('div.cursor-pointer');
 
