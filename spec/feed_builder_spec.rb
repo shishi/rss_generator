@@ -91,6 +91,66 @@ RSpec.describe FeedBuilder do
     end
   end
 
+  describe "#build pubDate の信頼性" do
+    # ENV["TZ"] を差し替えるのは、CI runner(ubuntu-latest)が UTC で、
+    # 開発機(WSH/WSL)が JST という環境差そのものを検証したいため。
+    def with_tz(tz)
+      original = ENV["TZ"]
+      ENV["TZ"] = tz
+      yield
+    ensure
+      ENV["TZ"] = original
+    end
+
+    # item に pubDate が出ていないことを「XML 全体に <pubDate> が無い」で
+    # 表すと、channel 側に pubDate を足した瞬間に検証が無効化される。
+    # 件数で数えることで、その変更が test の失敗として見える。
+    def pubdate_count(xml)
+      xml.scan("<pubDate>").size
+    end
+
+    it "日付が空のときは pubDate を出さない" do
+      episodes = [{ title: "第1話", url: "https://example.com/ep/1", date: "" }]
+      xml = FeedBuilder.new(site_config, episodes).build
+
+      expect(xml).to include("<title>第1話</title>")
+      expect(pubdate_count(xml)).to eq(0)
+    end
+
+    it "日付が解釈できないときは pubDate を出さない" do
+      episodes = [{ title: "第1話", url: "https://example.com/ep/1", date: "近日公開" }]
+      xml = FeedBuilder.new(site_config, episodes).build
+
+      expect(xml).to include("<title>第1話</title>")
+      expect(pubdate_count(xml)).to eq(0)
+    end
+
+    it "日付が未来のときは pubDate を出さない" do
+      future = (Time.now + (30 * 24 * 60 * 60)).strftime("%Y-%m-%d")
+      episodes = [{ title: "第52話", url: "https://example.com/ep/52", date: future }]
+      xml = FeedBuilder.new(site_config, episodes).build
+
+      expect(xml).to include("<title>第52話</title>")
+      expect(pubdate_count(xml)).to eq(0)
+    end
+
+    it "TZ が UTC の環境でも掲載日を JST として解釈する" do
+      with_tz("UTC") do
+        episodes = [{ title: "第1話", url: "https://example.com/ep/1", date: "2026-01-25" }]
+        xml = FeedBuilder.new(site_config, episodes).build
+
+        expect(xml).to include("<pubDate>Sun, 25 Jan 2026 00:00:00 +0900</pubDate>")
+      end
+    end
+
+    it "過去の日付はそのまま pubDate に出す" do
+      episodes = [{ title: "第1話", url: "https://example.com/ep/1", date: "2026-01-25" }]
+      xml = FeedBuilder.new(site_config, episodes).build
+
+      expect(xml).to include("<pubDate>Sun, 25 Jan 2026 00:00:00 +0900</pubDate>")
+    end
+  end
+
   describe "#save" do
     it "writes XML to specified file path" do
       builder = FeedBuilder.new(site_config, [])
