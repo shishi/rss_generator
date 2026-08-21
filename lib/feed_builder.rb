@@ -58,32 +58,32 @@ class FeedBuilder
     "#{@base_url}#{url}"
   end
 
-  # 確かな過去日のときだけ RFC2822 文字列を返す。
-  # 日付が無い / 解釈できない / 未来日のときは nil を返し、pubDate を省略させる。
+  # 解釈できた日付だけを RFC2822 文字列で返す。
+  # 日付が無い / 解釈できないときは nil を返し、pubDate を省略させる。
   #
   # 以前は Time.now にフォールバックしていたが、それは日付の取得失敗を
   # 「今日公開された」という嘘に変換してしまい、毎回の実行で値が変わる。
-  # 未来日はサイト側が掲載日とは別の日付（無料化予定日など）を出している場合に現れ、
-  # 日付でフィルタするリーダーが最新話を隠す原因になる。
+  # 日付が取れないなら、偽の値を出すより省略する（RSS 2.0 で pubDate は optional）。
   #
-  # 掲載日を JST 固定で解釈するのは、対象が日本のサイトの暦日表記であり、
-  # かつ実行環境の TZ が一致しないため。GitHub Actions の ubuntu-latest は UTC で、
-  # 環境ローカル解釈だと JST 00:00-09:00 に走った実行で「JST の当日公開分」が
-  # 未来日と誤判定され、最新話の pubDate だけが落ちる。push と workflow_dispatch は
-  # その時間帯に入りうる（schedule は 09:00 UTC なので該当しない）。
-  # Time.new にオフセットを明示するのは、ENV["TZ"] が tzdata 不在の環境で黙って
-  # UTC に落ちるのを避けるため。日付文字列に " +09:00" を連結する形は使えない
-  # （Time.parse は "+09:00" を時刻 09:00 として読み、静かに 9 時間ずれる）。
+  # サイトが未来日を出すことはある（2026-08-21 の実測では corocoro 3 作品の最新話と
+  # mangaone の先読み話 1 件）。その日付が何を指すのかは未確認。
+  # 判断材料が無いのでこちらで加工せず、サイトの表記をそのまま流す。
+  #
+  # 掲載日は JST 固定で解釈する。対象が日本のサイトの暦日表記であり、環境ローカル
+  # 解釈にすると生成場所（手元は JST / CI の ubuntu-latest は UTC）で同じ日付が
+  # 9 時間ずれるため。
+  #
+  # オフセットは Time.new に明示して渡す。日付文字列に " +09:00" を連結する形は
+  # 使えない。Time.parse はこれをオフセットではなく時刻 09:00 として読み、
+  # エラーを出さずに別の時刻になる。ずれ量は実行環境の TZ で変わるので、
+  # 数値を手がかりに追わないこと（JST なら 9 時間、UTC なら 18 時間）。
   JST_OFFSET = "+09:00"
 
   def format_date(date_str)
     return nil if date_str.nil? || date_str.empty?
 
     date = Date.parse(date_str)
-    time = Time.new(date.year, date.month, date.day, 0, 0, 0, JST_OFFSET)
-    return nil if time > Time.now
-
-    time.rfc2822
+    Time.new(date.year, date.month, date.day, 0, 0, 0, JST_OFFSET).rfc2822
   rescue ArgumentError
     # Date::Error は ArgumentError のサブクラスなので解釈不能な文字列もここに来る
     nil

@@ -125,13 +125,16 @@ RSpec.describe FeedBuilder do
       expect(pubdate_count(xml)).to eq(0)
     end
 
-    it "日付が未来のときは pubDate を出さない" do
+    # 件数ではなく値を検証する。件数だけだと、未来日を Time.now にクランプする
+    # 実装に変えても緑のまま通り、「サイトの表記どおり出す」という意図を守れない。
+    it "未来の日付でもサイトの表記どおり pubDate を出す" do
       future = (Time.now + (30 * 24 * 60 * 60)).strftime("%Y-%m-%d")
+      expected = Date.parse(future).strftime("%a, %d %b %Y 00:00:00 +0900")
       episodes = [{ title: "第52話", url: "https://example.com/ep/52", date: future }]
       xml = FeedBuilder.new(site_config, episodes).build
 
       expect(xml).to include("<title>第52話</title>")
-      expect(pubdate_count(xml)).to eq(0)
+      expect(xml).to include("<pubDate>#{expected}</pubDate>")
     end
 
     it "TZ が UTC の環境でも掲載日を JST として解釈する" do
