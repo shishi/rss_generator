@@ -43,13 +43,13 @@
           cairo
           alsa-lib
           mesa
-          xorg.libX11
-          xorg.libXcomposite
-          xorg.libXdamage
-          xorg.libXext
-          xorg.libXfixes
-          xorg.libXrandr
-          xorg.libxcb
+          libx11
+          libxcomposite
+          libxdamage
+          libxext
+          libxfixes
+          libxrandr
+          libxcb
           at-spi2-atk
           at-spi2-core
           gtk3
@@ -107,7 +107,7 @@
             nodejs
             pkgs.chromium
             pkgs.xvfb-run
-            pkgs.xorg.xorgserver
+            pkgs.xorg-server
             pkgs.fontconfig
             pkgs.noto-fonts
             pkgs.noto-fonts-cjk-sans
