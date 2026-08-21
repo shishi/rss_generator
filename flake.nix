@@ -23,6 +23,11 @@
           gemdir = ./.;
         };
 
+        # Node は 1 箇所で決める。lib/scraper.rb が Playwright の driver を
+        # `npx playwright` として PATH から spawn するため、npm install に使う版と
+        # driver を動かす版が一致していなければならない。
+        nodejs = pkgs.nodejs_24;
+
         # Shared system libraries for Chromium/Playwright
         chromiumLibs = with pkgs; [
           glib
@@ -60,12 +65,16 @@
           export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
           export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts"
           export LD_LIBRARY_PATH="${ldLibraryPath}"
+          # nix run .#generate / .#test は devShell を経由しないため、ここで PATH に
+          # 載せないと Ruby が spawn する npx が呼び出し元の ambient PATH 依存になる
+          # （npx が無ければ Scraper が例外を拾って空配列を返し、全サイト取得失敗）。
+          export PATH="${nodejs}/bin:$PATH"
         '';
 
         # npm install check for Playwright
         npmInstallCheck = ''
           if [ ! -d "node_modules" ]; then
-            ${pkgs.nodejs_22}/bin/npm install --silent
+            ${nodejs}/bin/npm install --silent
           fi
         '';
 
@@ -95,7 +104,7 @@
             gems
             gems.wrappedRuby
             pkgs.bundler
-            pkgs.nodejs_22
+            nodejs
             pkgs.chromium
             pkgs.xvfb-run
             pkgs.xorg.xorgserver

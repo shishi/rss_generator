@@ -14,7 +14,7 @@
 ## 必要環境
 
 - Ruby 3.3+
-- Node.js 22+
+- Node.js 24 (Active LTS)
 - Chromium（ローカル実行時）
 
 ## セットアップ
