@@ -7,6 +7,9 @@ require "yaml"
 
 RSpec.describe "RSS generation with the installed browser runtime" do
   it "scrapes an episode and writes the feed and index through the CLI" do
+    cli_path = File.realpath(ENV.fetch("PLAYWRIGHT_CLI_EXECUTABLE_PATH"))
+    expect(cli_path).to start_with("/nix/store/")
+
     Dir.mktmpdir("rss-browser") do |directory|
       html_path = File.join(directory, "episodes.html")
       File.write(html_path, <<~HTML)
@@ -33,9 +36,10 @@ RSpec.describe "RSS generation with the installed browser runtime" do
       output_path = File.join(directory, "output")
 
       stdout, stderr, status = Open3.capture3(
+        { "npm_config_offline" => "true", "npm_config_cache" => File.join(directory, "npm-cache") },
         "timeout", "--kill-after=5s", "15s", RbConfig.ruby,
-        "bin/generate", config_path, output_path,
-        chdir: File.expand_path("..", __dir__)
+        File.expand_path("../bin/generate", __dir__), config_path, output_path,
+        chdir: directory
       )
 
       expect(status.success?).to be(true), "#{stdout}\n#{stderr}"

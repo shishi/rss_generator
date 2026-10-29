@@ -24,10 +24,11 @@
 ```bash
 # 開発環境に入る
 nix develop
-
-# 依存関係をインストール
-bundle install
 ```
+
+Ruby gems と Playwright の npm 依存は、lockfile を入力に Nix が用意します。
+Nix 環境では `bundle install` や `npm install` は不要です。
+Playwright の CLI は Nix store 内の固定された実体を使います。
 
 ### 手動セットアップ
 
@@ -99,10 +100,17 @@ sites:
 
 ## 開発
 
+npm の依存定義を変更したときは、lockfile も更新してから Nix 環境を起動します。
+両者が一致しなければ、Nix の評価時にエラーになります。
+
+```bash
+nix shell --inputs-from . nixpkgs#nodejs_24 -c npm install --package-lock-only
+```
+
 ### テスト実行
 
 ```bash
-bundle exec rspec
+nix develop -c bundle exec rspec
 ```
 
 ### ディレクトリ構成

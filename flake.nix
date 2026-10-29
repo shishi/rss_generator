@@ -23,10 +23,17 @@
           gemdir = ./.;
         };
 
-        # Node は 1 箇所で決める。lib/scraper.rb が Playwright の driver を
-        # `npx playwright` として PATH から spawn するため、npm install に使う版と
-        # driver を動かす版が一致していなければならない。
         nodejs = pkgs.nodejs_24;
+
+        package = pkgs.lib.importJSON ./package.json;
+        packageLock = pkgs.lib.importJSON ./package-lock.json;
+        nodeModules =
+          assert pkgs.lib.assertMsg (package.dependencies == packageLock.packages."".dependencies)
+            "package.json dependencies differ from package-lock.json; regenerate the lockfile.";
+          pkgs.importNpmLock.buildNodeModules {
+            inherit package packageLock nodejs;
+            derivationArgs.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+          };
 
         # Shared system libraries for Chromium/Playwright
         chromiumLibs = with pkgs; [
@@ -61,21 +68,12 @@
         playwrightEnv = ''
           export PLAYWRIGHT_BROWSERS_PATH="${pkgs.chromium}/bin"
           export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+          export PLAYWRIGHT_CLI_EXECUTABLE_PATH="${nodeModules}/node_modules/.bin/playwright"
           export CHROME_PATH="${pkgs.chromium}/bin/chromium"
           export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
           export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts"
           export LD_LIBRARY_PATH="${ldLibraryPath}"
-          # nix run .#generate / .#test は devShell を経由しないため、ここで PATH に
-          # 載せないと Ruby が spawn する npx が呼び出し元の ambient PATH 依存になる
-          # （npx が無ければ Scraper が例外を拾って空配列を返し、全サイト取得失敗）。
           export PATH="${nodejs}/bin:$PATH"
-        '';
-
-        # npm install check for Playwright
-        npmInstallCheck = ''
-          if [ ! -d "node_modules" ]; then
-            ${nodejs}/bin/npm install --silent
-          fi
         '';
 
         # Helper to create app scripts
@@ -83,7 +81,6 @@
           type = "app";
           program = toString (pkgs.writeShellScript name ''
             ${playwrightEnv}
-            ${npmInstallCheck}
             ${script}
           '');
         };
@@ -91,7 +88,7 @@
       {
         apps = {
           test = mkApp "run-tests" ''
-            exec ${pkgs.xvfb-run}/bin/xvfb-run ${gems}/bin/rspec "$@"
+            exec ${pkgs.xvfb-run}/bin/xvfb-run ${gems.wrappedRuby}/bin/ruby -rbundler/setup ${gems}/bin/rspec "$@"
           '';
 
           generate = mkApp "generate-feeds" ''
@@ -105,6 +102,7 @@
             gems.wrappedRuby
             pkgs.bundler
             nodejs
+            nodeModules
             pkgs.chromium
             pkgs.xvfb-run
             pkgs.xorg-server
@@ -118,12 +116,6 @@
 
           shellHook = ''
             ${playwrightEnv}
-
-            # Install Playwright npm package if node_modules doesn't exist
-            if [ ! -d "node_modules" ]; then
-              echo "Installing Playwright npm package..."
-              npm install --silent
-            fi
 
             echo "RSS Generator development environment"
             echo "Ruby: $(ruby --version)"

@@ -33,6 +33,13 @@
       "matchUpdateTypes": ["lockFileMaintenance"],
       "groupName": "Ruby lock file maintenance",
       "branchTopic": "ruby-lock-file-maintenance"
+    },
+    {
+      "matchManagers": ["npm", "bundler"],
+      "matchPackageNames": ["playwright", "playwright-ruby-client"],
+      "groupName": "Playwright runtime",
+      "groupSlug": "playwright-runtime",
+      "separateMajorMinor": false
     }
   ],
   "lockFileMaintenance": {

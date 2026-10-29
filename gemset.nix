@@ -65,10 +65,10 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "0k5h85yk7pznq7i5nxh53jkrjivrskxpysv6iw4qf77r39xzm24c";
+      sha256 = "0gyqylh01h5kidl5am1kafaqqkhnzjjzfxpbij51qk4p8jg74s25";
       type = "gem";
     };
-    version = "3.2026.0113";
+    version = "3.2026.1027";
   };
   playwright-ruby-client = {
     dependencies = ["base64" "concurrent-ruby" "mime-types"];
@@ -76,10 +76,10 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "10p9gf2wy0bfa2ysrl4m56qa2mggpzhppxfall5yz167qcbma4c1";
+      sha256 = "0mgpb9sq9aq3ggpcfrvsv71f57flmqd0w9k4nv69v816b91zc3d3";
       type = "gem";
     };
-    version = "1.57.1";
+    version = "1.64.0";
   };
   rspec = {
     dependencies = ["rspec-core" "rspec-expectations" "rspec-mocks"];

@@ -27,7 +27,7 @@ jobs:
       - name: Cache Nix store
         uses: nix-community/cache-nix-action@v7
         with:
-          primary-key: ci-nix-${{ hashFiles('flake.nix', 'flake.lock', 'Gemfile.lock', 'gemset.nix') }}
+          primary-key: ci-nix-${{ hashFiles('flake.nix', 'flake.lock', 'Gemfile.lock', 'gemset.nix', 'package.json', 'package-lock.json') }}
           restore-prefixes-first-match: ci-nix-
           gc-max-store-size-linux: 4G
 
@@ -36,8 +36,8 @@ jobs:
           nix run --inputs-from . nixpkgs#bundix
           git diff --exit-code -- Gemfile.lock gemset.nix
 
-      - name: Install locked Node dependencies
-        run: nix develop -c npm ci
+      - name: Build locked runtime dependencies
+        run: nix build .#devShells.x86_64-linux.default.inputDerivation --no-link
 
       - name: Run specs
         run: nix develop -c bundle exec rspec
