@@ -42,7 +42,8 @@ class Scraper
   def fetch_episodes
     episodes = []
 
-    Playwright.create(playwright_cli_executable_path: "npx playwright") do |playwright|
+    cli_path = ENV.fetch("PLAYWRIGHT_CLI_EXECUTABLE_PATH", "npx playwright")
+    Playwright.create(playwright_cli_executable_path: cli_path) do |playwright|
       launch_options = { headless: true }
       launch_options[:executablePath] = ENV["CHROME_PATH"] if ENV["CHROME_PATH"]
 

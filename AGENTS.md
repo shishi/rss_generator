@@ -19,7 +19,8 @@ GitHub Actions が生成物を GitHub Pages に公開します。
 
 リポジトリのルートで実行します。エージェントのシェルでは direnv を前提にせず、`nix develop -c` を使ってください。
 `flake.nix` が Ruby の依存ライブラリー、Node.js、Chromium とブラウザー用の環境変数を用意します。
-開発環境への初回起動時は、`node_modules` がなければ npm の依存パッケージもインストールします。
+Ruby gems と Playwright の npm 依存は、lockfile を入力に Nix store へ用意します。
+開発環境や実行時に `npm install` は行わず、ローカルの `node_modules` も使いません。
 
 ```bash
 nix develop -c bundle exec rspec

@@ -9,8 +9,8 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0113)
-    playwright-ruby-client (1.57.1)
+    mime-types-data (3.2026.1027)
+    playwright-ruby-client (1.64.0)
       base64
       concurrent-ruby (>= 1.1.6)
       mime-types (>= 3.0)
