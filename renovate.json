@@ -1,0 +1,47 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "Asia/Tokyo",
+  "minimumReleaseAge": "3 days",
+  "platformAutomerge": true,
+  "automergeType": "pr",
+  "nix": {
+    "enabled": true
+  },
+  "bundler": {
+    "rangeStrategy": "update-lockfile"
+  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "minimumReleaseAge": "7 days",
+      "automerge": false
+    },
+    {
+      "matchManagers": ["bundler"],
+      "automerge": false,
+      "prBodyNotes": [
+        "Before merging, regenerate and commit gemset.nix with `nix run --inputs-from . nixpkgs#bundix`, then wait for ci to pass. Hosted Renovate updates Gemfile.lock without regenerating gemset.nix."
+      ]
+    },
+    {
+      "matchManagers": ["bundler"],
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "groupName": "Ruby lock file maintenance",
+      "branchTopic": "ruby-lock-file-maintenance"
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "minimumReleaseAge": "0 days",
+    "schedule": ["before 6am on monday"]
+  },
+  "vulnerabilityAlerts": {
+    "minimumReleaseAge": "0 days"
+  }
+}

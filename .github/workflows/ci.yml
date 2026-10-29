@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Cache Nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: ci-nix-${{ hashFiles('flake.nix', 'flake.lock', 'Gemfile.lock', 'gemset.nix') }}
+          restore-prefixes-first-match: ci-nix-
+          gc-max-store-size-linux: 4G
+
+      - name: Check Ruby dependency artifacts
+        run: |
+          nix run --inputs-from . nixpkgs#bundix
+          git diff --exit-code -- Gemfile.lock gemset.nix
+
+      - name: Install locked Node dependencies
+        run: nix develop -c npm ci
+
+      - name: Run specs
+        run: nix develop -c bundle exec rspec
