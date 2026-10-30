@@ -4,6 +4,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    packnix-bundler = {
+      url = "github:tomberek/packnix-bundler";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -11,13 +15,15 @@
       self,
       nixpkgs,
       flake-utils,
+      packnix-bundler,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
-        gems = pkgs.bundlerEnv {
+        gems = packnix-bundler.lib.buildBundlerApp {
+          inherit pkgs;
           name = "rss-generator-gems";
           ruby = pkgs.ruby_3_3;
           gemdir = ./.;
@@ -122,8 +128,8 @@
             echo "Node: $(node --version)"
             echo "Chromium: $(chromium --version 2>/dev/null || echo 'available')"
             echo ""
-            echo "Gems are managed by Nix (gemset.nix)"
-            echo "To update gems: bundle update && nix run nixpkgs#bundix -- -l"
+            echo "Gems are managed by Nix from Gemfile.lock checksums"
+            echo "To update gems: nix shell --inputs-from . nixpkgs#bundler nixpkgs#ruby_3_3 -c bundle lock --update --add-checksums"
             echo ""
             echo "Commands:"
             echo "  nix run .#generate  - Generate RSS feeds"

@@ -20,6 +20,9 @@ GitHub Actions が生成物を GitHub Pages に公開します。
 リポジトリのルートで実行します。エージェントのシェルでは direnv を前提にせず、`nix develop -c` を使ってください。
 `flake.nix` が Ruby の依存ライブラリー、Node.js、Chromium とブラウザー用の環境変数を用意します。
 Ruby gems と Playwright の npm 依存は、lockfile を入力に Nix store へ用意します。
+Ruby は `Gemfile.lock` の `CHECKSUMS` を直接使います。
+依存定義の変更後は `nix shell --inputs-from . nixpkgs#bundler nixpkgs#ruby_3_3 -c bundle lock --add-checksums` で、インストールせず lockfile を更新します。
+既存 gem の更新には `nix shell --inputs-from . nixpkgs#bundler nixpkgs#ruby_3_3 -c bundle lock --update --add-checksums` を使います。`gemset.nix` は不要です。
 開発環境や実行時に `npm install` は行わず、ローカルの `node_modules` も使いません。
 
 ```bash
