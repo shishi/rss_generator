@@ -38,7 +38,7 @@ jobs:
       - name: Cache Nix store
         uses: nix-community/cache-nix-action@v7
         with:
-          primary-key: nix-${{ hashFiles('flake.nix', 'flake.lock', 'gemset.nix', 'package.json', 'package-lock.json') }}
+          primary-key: nix-${{ hashFiles('flake.nix', 'flake.lock', 'Gemfile', 'Gemfile.lock', 'package.json', 'package-lock.json') }}
           restore-prefixes-first-match: nix-
           gc-max-store-size-linux: 4G
 

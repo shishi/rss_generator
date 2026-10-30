@@ -23,13 +23,6 @@
     },
     {
       "matchManagers": ["bundler"],
-      "automerge": false,
-      "prBodyNotes": [
-        "Before merging, regenerate and commit gemset.nix with `nix run --inputs-from . nixpkgs#bundix`, then wait for ci to pass. Hosted Renovate updates Gemfile.lock without regenerating gemset.nix."
-      ]
-    },
-    {
-      "matchManagers": ["bundler"],
       "matchUpdateTypes": ["lockFileMaintenance"],
       "groupName": "Ruby lock file maintenance",
       "branchTopic": "ruby-lock-file-maintenance"

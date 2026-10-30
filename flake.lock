@@ -34,10 +34,47 @@
         "type": "github"
       }
     },
+    "packnix": {
+      "locked": {
+        "lastModified": 1787609006,
+        "narHash": "sha256-/YoFLUisDsx1XaIsB1YYgd9gxpLIpkvjrTiTJwUdcCw=",
+        "owner": "tomberek",
+        "repo": "packnix",
+        "rev": "dc05c877eaf2bb445ff3dc7432dd1587b6c9a083",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tomberek",
+        "repo": "packnix",
+        "type": "github"
+      }
+    },
+    "packnix-bundler": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "packnix": "packnix"
+      },
+      "locked": {
+        "lastModified": 1787609068,
+        "narHash": "sha256-3fTV4Poe0b6RSyKMunfMw+5VXiJCxPwErZ/krzNph0U=",
+        "owner": "tomberek",
+        "repo": "packnix-bundler",
+        "rev": "da4f45405bdd3e94276ec45a7c6b50ed2d5dbfeb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tomberek",
+        "repo": "packnix-bundler",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "packnix-bundler": "packnix-bundler"
       }
     },
     "systems": {

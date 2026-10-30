@@ -27,6 +27,8 @@ nix develop
 ```
 
 Ruby gems と Playwright の npm 依存は、lockfile を入力に Nix が用意します。
+Ruby は [packnix-bundler](https://github.com/tomberek/packnix-bundler) が
+`Gemfile.lock` のチェックサムを直接読み、Nix が取得した gem を検証して構築します。
 Nix 環境では `bundle install` や `npm install` は不要です。
 Playwright の CLI は Nix store 内の固定された実体を使います。
 
@@ -99,6 +101,21 @@ sites:
 3. ワークフローが自動的に `output/` ディレクトリをデプロイします
 
 ## 開発
+
+Ruby の依存定義を変更したときは、次のコマンドで `Gemfile.lock` を更新します。
+`bundle lock` は gem をインストールせず、Nix の構築に必要なチェックサムも記録します。
+`gemset.nix` の生成・管理は不要です。
+
+```bash
+nix shell --inputs-from . nixpkgs#bundler nixpkgs#ruby_3_3 -c bundle lock --add-checksums
+```
+
+既存 gem のバージョンを更新する場合は、次のコマンドを使います。
+
+```bash
+nix shell --inputs-from . nixpkgs#bundler nixpkgs#ruby_3_3 -c bundle lock --update --add-checksums
+```
+特定の gem だけなら、`--update playwright-ruby-client` のように名前を指定します。
 
 npm の依存定義を変更したときは、lockfile も更新してから Nix 環境を起動します。
 両者が一致しなければ、Nix の評価時にエラーになります。
