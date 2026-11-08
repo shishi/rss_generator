@@ -4,6 +4,6 @@
   "private": true,
   "description": "Playwright dependency for RSS Generator",
   "dependencies": {
-    "playwright": "1.64.1"
+    "playwright": "1.65.0"
   }
 }
